@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,13 +36,14 @@ import com.nouroeddinne.sweetsstore.ShowDessertActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import Model.Model;
 import Model.ModelCart;
 import Utel.UtelsDB;
 
-public class Adapter extends RecyclerView.Adapter<Adapter.ViweHolder> {
+public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Context context;
     ArrayList<Model> dessertList = new ArrayList<Model>();
@@ -52,6 +54,12 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViweHolder> {
 
     private Map<String, Boolean> favoriteMap = new HashMap<>();
     private Map<String, Boolean> cartMap = new HashMap<>();
+
+    private static final int VIEW_TYPE_ITEM = 0;
+    private static final int VIEW_TYPE_LOADING = 1;
+
+    private boolean isLoadingAdded = false;
+
 
     public Adapter(Context context, ArrayList<Model> dessertList) {
         this.context = context;
@@ -67,243 +75,229 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViweHolder> {
 
     @NonNull
     @Override
-    public Adapter.ViweHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View viwe = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_dessert, parent, false);
-        return new ViweHolder(viwe);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        if (viewType == VIEW_TYPE_ITEM) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_list_dessert, parent, false);
+            return new ItemViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_loading, parent, false);
+            return new LoadingViewHolder(view);
+        }
+
+//        View viwe = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_dessert, parent, false);
+//        return new ViweHolder(viwe);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Adapter.ViweHolder holder, @SuppressLint("RecyclerView") int position) {
-        Model model;
-        boolean[] newStatus = {false,false};
-        int currentPosition =holder.getAdapterPosition();
-        model = dessertList.get(position);
-        holder.textName.setText(shorterWord(model.getName(),30));
-        holder.textPrice.setText(model.getPrice());
-        Glide.with(context).load(model.getImg()).into(holder.imgDessert);
-
-//        if (model.getFavorite()){
-//            holder.imgFavorate.setImageResource(R.drawable.favorite_full);
-//        }else {
-//            holder.imgFavorate.setImageResource(R.drawable.favorite_empty);
-//        }
-//
-//        if (model.getCart()){
-//            holder.imgCart.setVisibility(View.GONE);
-//        }else {
-//            holder.imgCart.setVisibility(View.VISIBLE);
-//        }
-
-        //db = DataBaseAccess.getInstance(context);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
 
-
-//        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                String data = String.valueOf(snapshot.child(model.getId()).child("id").getValue());
-//                if (data!=null){
-//                    if (data.equals(String.valueOf(model.getId())) && currentPosition==position){
-//                        Log.d("TAG", "onDataChange: "+model.getName());
-//                        holder.imgFavorate.setImageResource(R.drawable.favorite_full);
-//                        newStatus[0] = true;
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//
-//
-//
-//        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                String data = String.valueOf(snapshot.child(model.getId()).child("id").getValue());
-//                if (data!=null){
-//                    if (data.equals(String.valueOf(model.getId()))){
-//                        holder.imgCart.setVisibility(View.GONE);
-//                        newStatus[1] = true;
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-
-
-        if (favoriteMap.containsKey(model.getId())) {
-            holder.imgFavorate.setImageResource(R.drawable.favorite_full);
-        } else {
-            holder.imgFavorate.setImageResource(R.drawable.favorite_empty);
+        if (holder instanceof ItemViewHolder) {
+            // Bind your data to the view holder
+            Model item = dessertList.get(position);
+            ((ItemViewHolder) holder).bind(item);
+        } else if (holder instanceof LoadingViewHolder) {
+            // Configure the loading view if needed
+            ((LoadingViewHolder) holder).progressBar.setVisibility(View.VISIBLE);
         }
-
-        if (cartMap.containsKey(model.getId())) {
-            holder.imgCart.setVisibility(View.GONE);
-        } else {
-            holder.imgCart.setVisibility(View.VISIBLE);
-        }
-
-
-
-        holder.imgDessert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, ShowDessertActivity.class);
-                intent.putExtra("model",model);
-                context.startActivity(intent);
-            }
-        });
-
-
-
-
-
-        holder.imgFavorate.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onClick(View v) {
-                newStatus[0] =!newStatus[0];
-
-                if (newStatus[0]){
-
-                    databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).child(model.getId()).child("id").setValue(model.getId()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                //Toast.makeText(context, "isSuccessful", Toast.LENGTH_SHORT).show();
-                                holder.imgFavorate.setImageResource(R.drawable.favorite_full);
-                            }else{
-                                //Toast.makeText(context, "not Successful", Toast.LENGTH_SHORT).show();
-                                holder.imgFavorate.setImageResource(R.drawable.favorite_empty);
-                            }
-                        }
-                    });
-
-                }else {
-
-                    holder.imgFavorate.setImageResource(R.drawable.favorite_empty);
-
-                    DatabaseReference ref = databaseReferencere
-                            .child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE)
-                            .child(auth.getUid())
-                            .child(model.getId());
-                    ref.removeValue();
-
-                }
-
-//                dessertList.set(currentPosition, model);
-//                notifyItemChanged(currentPosition);
-
-                notifyDataSetChanged();
-
-
-//                model.setFavorite(newFavoriteStatus);
-//                db.open();
-//                db.updateDessert(model);
-//                db.close();
-                dessertList.set(currentPosition, model);
-
-            }
-        });
-
-        holder.imgCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                newStatus[1] =!newStatus[1];
-
-                if (newStatus[1]){
-
-                    ModelCart mc = new ModelCart(model.getPrice(),1,model.getId());
-
-                    databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(model.getId()).setValue(mc).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                //Toast.makeText(context, "isSuccessful", Toast.LENGTH_SHORT).show();
-                                holder.imgCart.setVisibility(View.GONE);
-                            }else{
-                                //Toast.makeText(context, "not Successful", Toast.LENGTH_SHORT).show();
-                                holder.imgCart.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    });
-
-                }else {
-                    holder.imgCart.setVisibility(View.VISIBLE);
-                }
-
-
-
-
-
-
-
-
-
-//                ModelCart mc = new ModelCart(model.getId(), 1,model.getPrice(),model.getPrice());
-//
-//                databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(model.getId()).setValue(mc).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()){
-//                            holder.imgCart.setVisibility(View.GONE);
-//                        }else{
-//                            holder.imgCart.setVisibility(View.VISIBLE);
-//                        }
-//                    }
-//                });
-//                notifyDataSetChanged();
-
-
-//                boolean newCartStatus = !model.getCart();
-//
-//                if (model.getCart()){
-//                }else {
-//                    holder.imgCart.setVisibility(View.VISIBLE);
-//                }
-//
-//                model.setCart(newCartStatus);
-//                db.open();
-//                db.updateDessert(model);
-//                db.addDessertCart(new ModelCart(String.valueOf(model.getId()),"1",String.valueOf(model.getPrice()),String.valueOf(model.getPrice())));
-//                db.close();
-//                notifyDataSetChanged();
-
-
-            }
-        });
-
-
 
     }
+
+
 
     @Override
     public int getItemCount() {
-        return dessertList.size();
+        return dessertList == null ? 0 : dessertList.size();
     }
 
-    public class ViweHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemViewType(int position) {
+        return (position == dessertList.size() - 1 && isLoadingAdded) ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
+    }
+
+    // Add a list of items
+    public void addItems(List<Model> items) {
+        dessertList.addAll(items);
+        notifyDataSetChanged();
+    }
+
+    // Add loading footer
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        dessertList.add(new Model()); // Add empty item
+        notifyItemInserted(dessertList.size() - 1);
+    }
+
+    // Remove loading footer
+    public void removeLoadingFooter() {
+        if (isLoadingAdded && dessertList.size() > 0) {
+            isLoadingAdded = false;
+            int position = dessertList.size() - 1;
+            dessertList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+
+
+    // View holder for normal items
+    public class ItemViewHolder extends RecyclerView.ViewHolder {
         TextView textName,textPrice;
         ImageView imgDessert,imgFavorate,imgCart;
-        public ViweHolder(@NonNull View itemView) {
-            super(itemView);
 
+        public ItemViewHolder(@NonNull View itemView) {
+            super(itemView);
             textName = itemView.findViewById(R.id.textView3);
             textPrice = itemView.findViewById(R.id.textView9);
             imgDessert = itemView.findViewById(R.id.imageView11);
             imgFavorate = itemView.findViewById(R.id.imageView10);
             imgCart = itemView.findViewById(R.id.imageView3);
+        }
+
+        public void bind(Model model) {
+
+
+            boolean[] newStatus = {false,false};
+            int currentPosition = getAdapterPosition();
+            //model = dessertList.get(currentPosition);
+            textName.setText(shorterWord(model.getName(),30));
+            textPrice.setText(model.getPrice());
+            Glide.with(context).load(model.getImg()).into(imgDessert);
+
+
+            if (favoriteMap.containsKey(model.getid())) {
+                imgFavorate.setImageResource(R.drawable.favorite_full);
+            } else {
+                imgFavorate.setImageResource(R.drawable.favorite_empty);
+            }
+
+            if (cartMap.containsKey(model.getid())) {
+                imgCart.setVisibility(View.GONE);
+            } else {
+                imgCart.setVisibility(View.VISIBLE);
+            }
+
+
+
+            imgDessert.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Log.d("TAG", "onCreate: "+model.getid());
+
+                    Intent intent = new Intent(context, ShowDessertActivity.class);
+                    intent.putExtra("model",model);
+                    context.startActivity(intent);
+                }
+            });
+
+
+
+
+
+            imgFavorate.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onClick(View v) {
+                    newStatus[0] =!newStatus[0];
+
+                    if (newStatus[0]){
+
+                        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).child(model.getid()).child("id").setValue(model.getid()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    //Toast.makeText(context, "isSuccessful", Toast.LENGTH_SHORT).show();
+                                    imgFavorate.setImageResource(R.drawable.favorite_full);
+                                }else{
+                                    //Toast.makeText(context, "not Successful", Toast.LENGTH_SHORT).show();
+                                    imgFavorate.setImageResource(R.drawable.favorite_empty);
+                                }
+                            }
+                        });
+
+                    }else {
+
+                        imgFavorate.setImageResource(R.drawable.favorite_empty);
+
+                        DatabaseReference ref = databaseReferencere
+                                .child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE)
+                                .child(auth.getUid())
+                                .child(model.getid());
+                        ref.removeValue();
+
+                    }
+
+                    notifyDataSetChanged();
+
+                    dessertList.set(currentPosition, model);
+
+                }
+            });
+
+            imgCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    newStatus[1] =!newStatus[1];
+
+                    if (newStatus[1]){
+
+                        ModelCart mc = new ModelCart(model.getPrice(),1,model.getid());
+
+                        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(model.getid()).setValue(mc).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    imgCart.setVisibility(View.GONE);
+                                }else{
+                                    imgCart.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
+
+                    }else {
+                        imgCart.setVisibility(View.VISIBLE);
+                    }
+
+
+
+                }
+            });
 
         }
     }
+
+    // View holder for the loading indicator
+    public class LoadingViewHolder extends RecyclerView.ViewHolder {
+        ProgressBar progressBar;
+
+        public LoadingViewHolder(@NonNull View itemView) {
+            super(itemView);
+            progressBar = itemView.findViewById(R.id.progress_bar);
+        }
+    }
+
+
+
+
+//    public class ViweHolder extends RecyclerView.ViewHolder {
+//        TextView textName,textPrice;
+//        ImageView imgDessert,imgFavorate,imgCart;
+//        public ViweHolder(@NonNull View itemView) {
+//            super(itemView);
+//
+//            textName = itemView.findViewById(R.id.textView3);
+//            textPrice = itemView.findViewById(R.id.textView9);
+//            imgDessert = itemView.findViewById(R.id.imageView11);
+//            imgFavorate = itemView.findViewById(R.id.imageView10);
+//            imgCart = itemView.findViewById(R.id.imageView3);
+//
+//        }
+//    }
 
 
 

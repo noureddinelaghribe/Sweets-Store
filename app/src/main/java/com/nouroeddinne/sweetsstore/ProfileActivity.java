@@ -3,6 +3,7 @@ package com.nouroeddinne.sweetsstore;
 import static Utel.UtelsDB.FIREBASE_TABLE_USERS;
 import static Utel.UtelsDB.SHAREDPREFERNCES_FILENAME_NAME;
 import static Utel.UtelsDB.SHAREDPREFERNCES_FILENAME_USER;
+import static Utel.UtelsDB.SHAREDPREFERNCES_SALLER;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,7 +12,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,8 +53,7 @@ public class ProfileActivity extends AppCompatActivity implements OnBackPressedD
     FirebaseUser firebaseUser;
     FirebaseDatabase firebaseDatabase;
 
-    ModelProfile profile;
-
+    Switch saller;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -69,18 +71,31 @@ public class ProfileActivity extends AppCompatActivity implements OnBackPressedD
         name = findViewById(R.id.textView_name);
         textView_total_sepend = findViewById(R.id.textView_total_sepend);
         textView_number_of_purches = findViewById(R.id.textView_number_of_purches);
+        saller = findViewById(R.id.switch_saller);
 
         auth = FirebaseAuth.getInstance();
         firebaseUser = auth.getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReferencere = firebaseDatabase.getReference();
 
-        //sharedPrferences = getSharedPreferences(SHAREDPREFERNCES_FILENAME_USER, Context.MODE_PRIVATE);
-//        if (sharedPreferences.getString(SHAREDPREFERNCES_FILENAME_NAME, null)!=null) {
-//            name.setText(sharedPreferences.getString(SHAREDPREFERNCES_FILENAME_NAME, null));
-//        }
+        sharedPreferences = getSharedPreferences(SHAREDPREFERNCES_SALLER, Context.MODE_PRIVATE);
+        if (sharedPreferences.getBoolean(SHAREDPREFERNCES_SALLER,false) != false) {
+            saller.setChecked(true);
+        }
 
-
+        saller.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sharedPreferences.edit().putBoolean(SHAREDPREFERNCES_SALLER, true).apply();
+                } else {
+                    sharedPreferences.edit().putBoolean(SHAREDPREFERNCES_SALLER, false).apply();
+                }
+                Intent intent = new Intent(ProfileActivity.this, SplashScreenActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
 
         databaseReferencere.child(FIREBASE_TABLE_USERS).child(auth.getUid()).addValueEventListener(new ValueEventListener() {

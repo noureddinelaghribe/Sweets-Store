@@ -134,9 +134,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
-                startActivity(intent);
-                finish();
+                Toast.makeText(LoginActivity.this, "Coming Soon", Toast.LENGTH_SHORT).show();
+
+//                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+//                startActivity(intent);
+//                finish();
 
             }
         });

@@ -42,6 +42,8 @@ public class UtelsDB {
     public static final String SHAREDPREFERNCES_FILENAME_NAME="name";
     public static final String SHAREDPREFERNCES_FILENAME_EMAIL="email";
     public static final String SHAREDPREFERNCES_FILENAME_GENDER="gender";
+    public static final String SHAREDPREFERNCES_SALLER="saller";
+
 
 
 

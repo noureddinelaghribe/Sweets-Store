@@ -6,14 +6,24 @@ import android.os.Parcelable;
 
 public class Model implements Parcelable {
 
-    private String uid;
+    private String id;
+    private String by;
     private String name;
     private String price;
     private String img;
     private String type;
 
-    public Model(String uid, String name, String price, String type, String img) {
-        this.uid = uid;
+    public Model(String id, String by, String name, String price, String img, String type) {
+        this.id = id;
+        this.by = by;
+        this.name = name;
+        this.price = price;
+        this.img = img;
+        this.type = type;
+    }
+
+    public Model(String id, String name, String price, String type, String img) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.type = type;
@@ -35,7 +45,7 @@ public class Model implements Parcelable {
     public Model() {}
 
     protected Model(Parcel in) {
-        uid = in.readString();
+        id = in.readString();
         name = in.readString();
         price = in.readString();
         img = in.readString();
@@ -61,7 +71,7 @@ public class Model implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
+        dest.writeString(id);
         dest.writeString(name);
         dest.writeString(price);
         dest.writeString(img);
@@ -70,12 +80,21 @@ public class Model implements Parcelable {
 
     // Getters and setters for the fields
 
-    public String getId() {
-        return uid;
+
+    public String getid() {
+        return id;
     }
 
-    public void setId(String id) {
-        this.uid = id;
+    public void setid(String id) {
+        this.id = id;
+    }
+
+    public String getBy() {
+        return by;
+    }
+
+    public void setBy(String by) {
+        this.by = by;
     }
 
     public String getName() {

@@ -106,7 +106,7 @@ public class AdapterCart extends RecyclerView.Adapter<AdapterCart.ViweHolder>{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, ShowDessertActivity.class);
-                intent.putExtra("position",model.getId());
+                intent.putExtra("position",model.getid());
                 context.startActivity(intent);
             }
         });

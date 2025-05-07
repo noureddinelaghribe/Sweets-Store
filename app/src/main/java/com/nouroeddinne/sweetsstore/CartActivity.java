@@ -275,7 +275,7 @@ public class CartActivity extends AppCompatActivity implements OnBackPressedDisp
             data.put(model.getId(), model.getId());
         }
 
-        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CHECKOUT).child(auth.getUid()).child(key).child("totalSpend").setValue(total);
+        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CHECKOUT).child(auth.getUid()).child(key).child("totalSpend").setValue( totalPrice.getText());
         databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CHECKOUT).child(auth.getUid()).child(key).child("ids").setValue(data)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

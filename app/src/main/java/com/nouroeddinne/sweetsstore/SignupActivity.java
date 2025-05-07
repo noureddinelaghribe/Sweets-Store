@@ -101,7 +101,6 @@ public class SignupActivity extends AppCompatActivity {
         checkBoxIgree  = findViewById(R.id.checkBoxIgree);
 
         auth = FirebaseAuth.getInstance();
-
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReferencere = firebaseDatabase.getReference();
 
@@ -190,9 +189,11 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(SignupActivity.this,HomeActivity.class);
-                startActivity(intent);
-                finish();
+                Toast.makeText(SignupActivity.this, "Coming Soon", Toast.LENGTH_SHORT).show();
+
+//                Intent intent = new Intent(SignupActivity.this,HomeActivity.class);
+//                startActivity(intent);
+//                finish();
 
             }
         });

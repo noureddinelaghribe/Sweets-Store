@@ -11,13 +11,12 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="3"
+        android:layout_height="150dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="10dp">
 
@@ -293,7 +292,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:gravity="bottom|center"
             android:orientation="vertical">
 
@@ -324,7 +323,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    app:srcCompat="@drawable/logo_facebook" />
+                    android:src="@drawable/logo_facebook" />
 
             </LinearLayout>
 
@@ -339,7 +338,7 @@
                 android:id="@+id/imageView_google"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                app:srcCompat="@drawable/logo_google" />
+                android:src="@drawable/logo_google" />
 
         </LinearLayout>
 

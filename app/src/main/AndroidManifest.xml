@@ -15,6 +15,12 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".AddDessertActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeSallerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ForgottenPasswordActivity"
             android:exported="false" />
         <activity

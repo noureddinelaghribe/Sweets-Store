@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import Controlar.AdapterFavorate;
@@ -33,11 +34,13 @@ public class Favourite_Dessert_Activity extends AppCompatActivity implements OnB
     ImageView back;
     RecyclerView recyclerView;
     AdapterFavorate adapter;
-    ArrayList<String> idDessertList = new ArrayList<>();
+    ArrayList<Model> idDessertList = new ArrayList<>();
+    ArrayList<String> DessertList = new ArrayList<>();
     //DataBaseAccess db = DataBaseAccess.getInstance(this);
 
     FirebaseAuth auth;
     DatabaseReference databaseReferencere;
+    DatabaseReference databaseReferencere2;
     FirebaseUser firebaseUser;
     FirebaseDatabase firebaseDatabase;
 
@@ -54,6 +57,7 @@ public class Favourite_Dessert_Activity extends AppCompatActivity implements OnB
         firebaseUser = auth.getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReferencere = firebaseDatabase.getReference();
+        databaseReferencere2 = firebaseDatabase.getReference();
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -67,8 +71,8 @@ public class Favourite_Dessert_Activity extends AppCompatActivity implements OnB
 
         Toast.makeText(this, ""+idDessertList.size(), Toast.LENGTH_SHORT).show();
 
-        adapter = new AdapterFavorate(this, idDessertList);
-        recyclerView.setAdapter(adapter);
+//        adapter = new AdapterFavorate(this, idDessertList);
+//        recyclerView.setAdapter(adapter);
 
 
         callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -96,27 +100,42 @@ public class Favourite_Dessert_Activity extends AppCompatActivity implements OnB
 
     private void loadData() {
 
-        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).addChildEventListener(new ChildEventListener() {
+        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d("Firebase", "onChildAdded loadData: "+snapshot.getKey());
-                idDessertList.add(snapshot.getKey());
-                adapter.notifyDataSetChanged();
+            public void onDataChange(@NonNull DataSnapshot snapshot2) {
 
-            }
+                for (DataSnapshot snapshotIdModel : snapshot2.getChildren()) {
+                    String idModel = snapshotIdModel.getKey();
+                    //DessertList.add(idModel);
+                    Log.d("TAG", "loadData onDataChange 1 : "+idModel);
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    if (idModel != null){
+                        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT).child(idModel).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshotM) {
 
-            }
+                                try {
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                                    Log.d("TAG", "loadData onDataChange 2 : "+snapshotM);
+                                    Model m = snapshotM.getValue(Model.class);
+                                    idDessertList.add(m);
+                                    adapter = new AdapterFavorate(Favourite_Dessert_Activity.this, idDessertList);
+                                    recyclerView.setAdapter(adapter);
 
-            }
+                                } catch (Exception e) {
+                                    Log.e("TAG", "Error parsing model", e);
+                                }
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+
+                }
 
             }
 
@@ -125,6 +144,41 @@ public class Favourite_Dessert_Activity extends AppCompatActivity implements OnB
 
             }
         });
+
+
+
+
+
+//
+//        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                Log.d("Firebase", "onChildAdded loadData: "+snapshot.getKey());
+//                idDessertList.add(snapshot.getKey());
+//                adapter.notifyDataSetChanged();
+//
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         Toast.makeText(this, ""+idDessertList.size(), Toast.LENGTH_SHORT).show();
 

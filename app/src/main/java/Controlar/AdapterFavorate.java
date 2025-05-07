@@ -1,7 +1,6 @@
 package Controlar;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -10,10 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -23,19 +20,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nouroeddinne.sweetsstore.OnClickListener;
 import com.nouroeddinne.sweetsstore.R;
 import com.nouroeddinne.sweetsstore.ShowDessertActivity;
 
 import java.util.ArrayList;
 import Model.Model;
-import Model.ModelCart;
 import Utel.UtelsDB;
 
 public class AdapterFavorate extends RecyclerView.Adapter<AdapterFavorate.ViweHolder> {
@@ -45,12 +39,12 @@ public class AdapterFavorate extends RecyclerView.Adapter<AdapterFavorate.ViweHo
     DatabaseReference databaseReferencere;
     FirebaseUser firebaseUser;
     FirebaseDatabase firebaseDatabase;
-    ArrayList<String> idDessertList = new ArrayList<>();
+    ArrayList<Model> idDessertList = new ArrayList<>();
     Context context;
 
 
 
-    public AdapterFavorate(Context context, ArrayList<String> idDessertList) {
+    public AdapterFavorate(Context context, ArrayList<Model> idDessertList) {
         this.context = context;
         this.idDessertList = idDessertList;
         auth = FirebaseAuth.getInstance();
@@ -70,31 +64,62 @@ public class AdapterFavorate extends RecyclerView.Adapter<AdapterFavorate.ViweHo
         int currentPosition =holder.getAdapterPosition();
         boolean[] newStatus = {false};
 
-        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT).child(idDessertList.get(currentPosition)).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                Model model = snapshot.getValue(Model.class);
-                holder.textName.setText(shorterWord(model.getName(),30));
-                holder.textPrice.setText(model.getPrice());
-                Glide.with(context).load(model.getImg()).into(holder.imgDessert);
-                holder.imgFavorate.setImageResource(R.drawable.favorite_full);
+        Model model = idDessertList.get(currentPosition);
 
-            }
+        if (model!=null){
+            Log.d("TAG", "onDataChange: "+model);
+            Log.d("TAG", "onDataChange: "+model.getid());
+            Log.d("TAG", "onDataChange: "+model.getBy());
+            Log.d("TAG", "onDataChange: "+model.getImg());
+            Log.d("TAG", "onDataChange: "+model.getName());
+            Log.d("TAG", "onDataChange: "+model.getPrice());
+            Log.d("TAG", "onDataChange: "+model.getType());
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            holder.textName.setText(shorterWord(model.getName(),30));
+            holder.textPrice.setText(model.getPrice());
+            Glide.with(context).load(model.getImg()).into(holder.imgDessert);
+            holder.imgFavorate.setImageResource(R.drawable.favorite_full);
+        }
 
-            }
-        });
+
+
+//        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT).child(idDessertList.get(currentPosition)).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                Model model = snapshot.getValue(Model.class);
+//
+//                if (model!=null){
+//                    Log.d("TAG", "onDataChange: "+model);
+//                    Log.d("TAG", "onDataChange: "+model.getid());
+//                    Log.d("TAG", "onDataChange: "+model.getBy());
+//                    Log.d("TAG", "onDataChange: "+model.getImg());
+//                    Log.d("TAG", "onDataChange: "+model.getName());
+//                    Log.d("TAG", "onDataChange: "+model.getPrice());
+//                    Log.d("TAG", "onDataChange: "+model.getType());
+//
+//                    holder.textName.setText(shorterWord(model.getName(),30));
+//                    holder.textPrice.setText(model.getPrice());
+//                    Glide.with(context).load(model.getImg()).into(holder.imgDessert);
+//                    holder.imgFavorate.setImageResource(R.drawable.favorite_full);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
 
         databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String data = String.valueOf(snapshot.child(idDessertList.get(currentPosition)).child("id").getValue());
+                String data = String.valueOf(snapshot.child(idDessertList.get(currentPosition).getid()).child("id").getValue());
                 if (data!=null){
-                    if (data.equals(String.valueOf(idDessertList.get(currentPosition)))){
+                    if (data.equals(String.valueOf(idDessertList.get(currentPosition).getid()))){
                         holder.imgCart.setVisibility(View.GONE);
                         newStatus[0] = true;
                     }
@@ -127,7 +152,7 @@ public class AdapterFavorate extends RecyclerView.Adapter<AdapterFavorate.ViweHo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, ShowDessertActivity.class);
-                intent.putExtra("position",idDessertList.get(currentPosition).toString());
+                intent.putExtra("position",idDessertList.get(currentPosition).getid().toString());
                 context.startActivity(intent);
 
             }
@@ -143,7 +168,7 @@ public class AdapterFavorate extends RecyclerView.Adapter<AdapterFavorate.ViweHo
                 DatabaseReference ref = databaseReferencere
                         .child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE)
                         .child(auth.getUid())
-                        .child(idDessertList.get(currentPosition));
+                        .child(idDessertList.get(currentPosition).getid());
 
                 ref.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -184,7 +209,7 @@ public class AdapterFavorate extends RecyclerView.Adapter<AdapterFavorate.ViweHo
 
                 if (newStatus[0]){
 
-                    databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(idDessertList.get(currentPosition)).child("id").setValue(idDessertList.get(currentPosition)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(idDessertList.get(currentPosition).getid()).child("id").setValue(idDessertList.get(currentPosition).getid()).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){

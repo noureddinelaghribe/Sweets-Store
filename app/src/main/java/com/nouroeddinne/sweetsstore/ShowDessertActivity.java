@@ -126,11 +126,14 @@ public class ShowDessertActivity extends AppCompatActivity implements OnBackPres
             textName.setText(model.getName());
             textPrice.setText(model.getPrice());
 
-            databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).child(model.getId()).child("id").addValueEventListener(new ValueEventListener() {
+
+
+            databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid())
+                    .child(model.getid()).child("id").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                    if (snapshot.getValue()!=null && snapshot.getValue().toString().equals(model.getId())){
+                    if (snapshot.getValue()!=null && snapshot.getValue().toString().equals(model.getid())){
                         imgFavorate.setImageResource(R.drawable.favorite_full);
                         newStatus = true;
                     }else{
@@ -176,7 +179,7 @@ public class ShowDessertActivity extends AppCompatActivity implements OnBackPres
 
                     if (newStatus){
 
-                        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).child(model.getId()).child("id").setValue(model.getId()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE).child(auth.getUid()).child(model.getid()).child("id").setValue(model.getid()).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()){
@@ -194,7 +197,7 @@ public class ShowDessertActivity extends AppCompatActivity implements OnBackPres
                         DatabaseReference ref = databaseReferencere
                                 .child(UtelsDB.FIREBASE_TABLE_DESSERT_FAVORATE)
                                 .child(auth.getUid())
-                                .child(model.getId());
+                                .child(model.getid());
 
                         ref.removeValue();
 
@@ -220,9 +223,9 @@ public class ShowDessertActivity extends AppCompatActivity implements OnBackPres
                 @Override
                 public void onClick(View v) {
 
-                    ModelCart mc = new ModelCart(model.getPrice(),itemCount,model.getId());
+                    ModelCart mc = new ModelCart(model.getPrice(),itemCount,model.getid());
 
-                    databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(model.getId()).setValue(mc).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    databaseReferencere.child(UtelsDB.FIREBASE_TABLE_DESSERT_CART).child(auth.getUid()).child(model.getid()).setValue(mc).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){

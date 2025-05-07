@@ -3,6 +3,7 @@ package com.nouroeddinne.sweetsstore;
 import static Utel.UtelsDB.SHAREDPREFERNCES_FILENAME_EMAIL;
 import static Utel.UtelsDB.SHAREDPREFERNCES_FILENAME_ITEMS;
 import static Utel.UtelsDB.SHAREDPREFERNCES_FILENAME_USER;
+import static Utel.UtelsDB.SHAREDPREFERNCES_SALLER;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -35,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        sharedPreferences = getSharedPreferences(SHAREDPREFERNCES_SALLER, Context.MODE_PRIVATE);
+        if (sharedPreferences.getBoolean(SHAREDPREFERNCES_SALLER,false) != false) {
+            Intent intent = new Intent(this, HomeSallerActivity.class);
+            startActivity(intent);
+        }
+
 
         favourite = findViewById(R.id.imageView_favourite);
         cart = findViewById(R.id.imageView_cart);
@@ -184,13 +193,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             CandyList.add(m);
                             break;
                         default:
-                            Log.d("TAG", "onChildAdded: facccccccccccccccccccccccccccccccccccccccccccccccccccccck");
+                            Log.d("TAG", "onChildAdded: other");
                             break;
                     }
 
                 }
 
                 adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
+
+                //to random all element dessertList
+                Collections.shuffle(dessertList);
 
                 adapter.addTab(new ModelPager("All", HomeFragment.newInstance("All", dessertList)));
                 adapter.addTab(new ModelPager("Capcake", HomeFragment.newInstance("Capcake", CapcakeList)));
