@@ -2,6 +2,14 @@
 
 Welcome to the **Sweet Store** app! This application allows multiple sellers to list and sell their delicious sweets while providing customers a seamless shopping experience. Built using Java and Android Studio, Sweet Store is a platform for sweet lovers and small businesses alike.
 
+## Download
+
+<p align="center">
+    <a href="https://github.com/noureddinelaghribe/Sweets-Store/raw/refs/heads/main/Sweets%20Store.apk">
+        <img src="https://raw.githubusercontent.com/noureddinelaghribe/WriteFlow/refs/heads/main/download_apk.png" alt="Get it on Google Play" height="80">
+    </a>
+</p>
+
 ## Screenshots
 
 Here are some screenshots of the Sweet Store app:
